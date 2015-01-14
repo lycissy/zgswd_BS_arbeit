@@ -1,10 +1,10 @@
-// The general discription of the Wu's
+﻿// The general description of the Wu's
 Wu's algorithm works in the following steps:
 1. picture -> terminal regions ( done by tools )
-2. bottom-up: termianl regions -> nontermianl regions ( doing by symmetric detection )
-3. get rules: nonternial regions -> corresponding rules ( get all the possible corresponding rules )
-4. evaluation: all possible rules -> optinal rules 
-5. optianl rules add to grammar; go to STEP 3.
+2. bottom-up: terminal regions -> nonterminal regions ( doing by symmetric detection )
+3. get rules: nonterminal regions -> corresponding rules ( get all the possible corresponding rules )
+4. evaluation: all possible rules -> optimal rules 
+5. optimal rules add to grammar; go to STEP 3.
 6. result-output: ruleset -> grammar file.
 
 -----------------------------------------------
@@ -12,40 +12,107 @@ Wu's algorithm works in the following steps:
 -----------------------------------------------
 ===============================================
 1. picture -> terminal regions ( done by tools )
-	Imput picture manually determined in terminal regions;
+	Input picture manually determined in terminal regions;
 
 **	datastructure: class Symbol_2D
 		variables: position(x,y); size(w,h); label(materials); 
 		boolen: ternimal(Y/N);
 
 ===============================================
-2. bottom-up: termianl regions -> nontermianl regions ( doing by symmetric detection )
+2. bottom-up: termianl regions -> nonterminal regions ( doing by symmetric detection )
+** functions: compare regions
+		1) "repeated regions":	has the same_size & same_materials;	// for terminal regions
+							or  has the same_size & same_consistsSybols;	// for nonterminal regions
+		2) "same regions":		has the same_position & same_size;
+		3) "similar regions" :	has the same_size but not "repeat regions"
+		4) "neibour regions" :	two region share a edge.
+** algorithm: sysmetric detection
+		// Part1: detect the "repeat regions"; --- //
+		1) find the "repeat"( with same size & materials) terminal/nonterminal region. 
+			if "repeat" -> 2); if no "repeat region" -> 4);
+		2) check if they can merged with their "neighbour regions"( check in four direction )
+			if so -> 3); if not -> 1);
+		3) merging the neighbour, check if the merged regions still the "repeat" ( size & each terminal region contained.)
+			if so -> 2); if not -> 1);
+		// Part2: detect the "similar regions" --- //
+		4) find the "similar regions ": ( same size but not same material or consists differenct regions )
+			if have -> 5) ; if no " similar regions" -> 7);
+		5) check if they can merged with their "neighbour regions"( check in four derection )
+			if can -> 6) ;	if cannot -> 4);
+		6) merge the neighbour regions, check if the merged regions still "similar regions"
+			if so -> 5); if not -> 4);
+		// Part3: merge the regions in the row and colomn --- //
+		7) merge all the "neighbour region" possible to merging in the row;
+		8) merge all the "neighbour region" possible to merging in the col;
+		9) check if there's only one region after mergin
+			if so -> end; else -> 7);
+
+		Problems: 
+			how could we make sure the 7) to 9) not a infinitive loop;
 
 ** datastructure: NT_Symbols
 		variables: position(x,y); size(w,h); label(materials); 
-		boolen: ternimal(Y/N);
-		vector< consist Symbol_2Ds > ( for nontermianl region );
+		boolen: terminal(Y/N); active(Y/N);
+		vector< consist Symbol_2Ds > ( for nontermial region );
+		structure: rule( rule_names, rule_variables )
 		
-
-** algorithm: sysmetric detection
-		1) find the "same"( with same size & materials) terminal/nonterminal region. 
-			if "same" -> 2); if not "same" -> 4);
-		2) check if their neighbour regions can be merged ( check in four derection )
-			if so -> 3); if not -> 1);
-		3) after merging if the regions still the "same" ( size & each terminal region contained.)
-			if so -> 2); if not -> 4);
-		4) 
-
 	Problems: 
-		How to get all the possible untermial regions?
-		How could we make sure that not same mergen will be taken?
+		Is it better to create two different data structure for terminal and non-terminal regions?
+		---- Possible solution:
+			seems not necessary as we can take a boolen variable to show the region is terminal or not.
+		How to get all the possible nontermial regions? ( according to different merging.)
+		---- Possible solution:
+			Grow a region in four different direction, so that four different updated nonterminal region will be get.
+			But we need to store all the possible merging after each merge operation, the storage will exponential rised. 
+		How could we make sure that not same merging will be retaken?
+		---- Possible solution:
+			 After each merging swiched the former Symbols into inactive. 
+			 But since we need to check four direction, each time the symbols need four copies for the different possible merging.
 		What kind of data structure could be used? 
+		---- Possible solution 1:
+			Using a tree structure,after each merge add a parent node into the tree.
+			It is more easier to show the relevance between the sybmols.
+			But harder to compare the possible rule for a same region as they are in different tree.
+		---- Possible solution 2:
+			Just using the Class NT_Symbols to store all the non-terminal regions. 
+			It is easier to compare the derived rules of the same region.
+			But it might course confusion while there're too many same regions belongs to different merging process.
+		---- Which is better?
 
 ===============================================
 3. get rules: nonternial regions -> corresponding rules ( get all the possible corresponding rules )
+** Algorithm:
+		1) Go through all the nonterminal symbols, generate the rules according to the vector<Symbol> included.
+			( Since the Sybols contained in each nonterminal region is clear, it is easy to get the rules.)
+		2) As there's different merging process, there will gives different rule set.
+
+** Datastructure: Rule
+		string: Symbol name, rule name( split or repeat);
+		< variables, derived symbols >
+		value: costs, splitting_heuristics;
+
+** Datastructure: RuleSet
+		necessary ?? 
+		
 ===============================================
 4. evaluation: all possible rules -> optinal rules 
+** Algorithm:
+		// Step1: for each rule set:
+		1) initialize to state S0 without rules;
+		2) evaluate the rules in the ruleSet and add them to the state;
+		3) Until all the rules are evaluated.
+		// Step2: 
+		4) go through all the left rule set;
+		// Step3:
+		5) compare the Costs of the rule sets. The one with the lowest costs is the optimal grammar.
+
+		Problem:
+		1) While selecting grammar, wich way ( exploration or exploitation) shall I taken? or both of them should be considered?
+		2) The grammar generate from the rule set are already fixed when we get the nonßterminal region.
+			( Is that we need to find different split rules for non-terminal regions in 3? Not the way how the non-terminal region is get? )
+			 
 ===============================================
-5. optianl rules add to grammar; go to STEP 3.
-===============================================
-6. result-output: ruleset -> grammar file.
+5. result-output: ruleset -> grammar file.
+	This part is easy and clear.
+
+That's all that I've thinking about.
