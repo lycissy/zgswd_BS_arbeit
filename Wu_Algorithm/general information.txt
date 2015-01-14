@@ -17,10 +17,15 @@ Wu's algorithm works in the following steps:
 **	datastructure: class Symbol_2D
 		variables: position(x,y); size(w,h); label(materials); 
 		boolen: ternimal(Y/N);
-		vector< consist Symbol_2Ds > ( for nontermianl region );
 
 ===============================================
 2. bottom-up: termianl regions -> nontermianl regions ( doing by symmetric detection )
+
+** datastructure: NT_Symbols
+		variables: position(x,y); size(w,h); label(materials); 
+		boolen: ternimal(Y/N);
+		vector< consist Symbol_2Ds > ( for nontermianl region );
+		
 
 ** algorithm: sysmetric detection
 		1) find the "same"( with same size & materials) terminal/nonterminal region. 
