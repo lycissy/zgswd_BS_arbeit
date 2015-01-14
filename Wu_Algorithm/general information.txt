@@ -1,0 +1,46 @@
+// The general discription of the Wu's
+Wu's algorithm works in the following steps:
+1. picture -> terminal regions ( done by tools )
+2. bottom-up: termianl regions -> nontermianl regions ( doing by symmetric detection )
+3. get rules: nonternial regions -> corresponding rules ( get all the possible corresponding rules )
+4. evaluation: all possible rules -> optinal rules 
+5. optianl rules add to grammar; go to STEP 3.
+6. result-output: ruleset -> grammar file.
+
+-----------------------------------------------
+**************** Step by step ****************
+-----------------------------------------------
+===============================================
+1. picture -> terminal regions ( done by tools )
+	Imput picture manually determined in terminal regions;
+
+**	datastructure: class Symbol_2D
+		variables: position(x,y); size(w,h); label(materials); 
+		boolen: ternimal(Y/N);
+		vector< consist Symbol_2Ds > ( for nontermianl region );
+
+===============================================
+2. bottom-up: termianl regions -> nontermianl regions ( doing by symmetric detection )
+
+** algorithm: sysmetric detection
+		1) find the "same"( with same size & materials) terminal/nonterminal region. 
+			if "same" -> 2); if not "same" -> 4);
+		2) check if their neighbour regions can be merged ( check in four derection )
+			if so -> 3); if not -> 1);
+		3) after merging if the regions still the "same" ( size & each terminal region contained.)
+			if so -> 2); if not -> 4);
+		4) 
+
+	Problems: 
+		How to get all the possible untermial regions?
+		How could we make sure that not same mergen will be taken?
+		What kind of data structure could be used? 
+
+===============================================
+3. get rules: nonternial regions -> corresponding rules ( get all the possible corresponding rules )
+===============================================
+4. evaluation: all possible rules -> optinal rules 
+===============================================
+5. optianl rules add to grammar; go to STEP 3.
+===============================================
+6. result-output: ruleset -> grammar file.
